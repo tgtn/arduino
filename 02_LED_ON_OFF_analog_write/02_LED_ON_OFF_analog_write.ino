@@ -2,7 +2,7 @@
 
 int brightness = 0;    // how bright the LED is
 int fadeAmount = 5;    // how many points to fade the LED by
-int ledPin = 9;
+int ledPin = 9; // led pin
 
 void setup() {
   pinMode(ledPin, OUTPUT);

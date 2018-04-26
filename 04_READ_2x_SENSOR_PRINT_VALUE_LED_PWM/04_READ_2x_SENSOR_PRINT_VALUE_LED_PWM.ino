@@ -11,7 +11,7 @@ int echoPin2 = 2; // pinul pe care primim raspunsul
 double prevReadingCm2 = 0; // previously read value in centimeters; we use it to remove errouneous readings
 
 #define minDistance 20
-int ledPin = 6; // led de semnalizare
+int ledPin = 6; // led de semnalizare obstacol detectat
 void setup() {
   Serial.begin(9600);
   pinMode(trigPinSenzorDreapta, OUTPUT);

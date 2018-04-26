@@ -9,7 +9,7 @@ int echoPinSenzorDreapta = 10; // pinul pe care primim raspunsul
 
 double distantaDreapta, distantaStanga;
 #define minDistance 20
-#define ledPin LED_BUILTIN // led de semnalizare obstacol detectat
+#define ledPin LED_BUILTIN // led de semnalizare cand un obstacol e detectat
 
 // viteza motoarelor
 #define VITEZA_MOTOR_DREAPTA 99

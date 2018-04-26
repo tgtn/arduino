@@ -2,7 +2,7 @@
 
 int pingPin = 3; // pinul pe care dam senzorului comanda de masurare
 int inPin = 2; // pinul pe care primim raspunsul de la senzor
-int ledPin = 9; // led de semnalizare
+int ledPin = 9; // led de semnalizare obstacol detectat
 double prevReadingCm = 0; // previously read value in centimeters; we use it to remove errouneous readings
 
 void setup() {
