@@ -12,8 +12,8 @@ double distantaDreapta, distantaStanga;
 #define ledPin LED_BUILTIN // led de semnalizare obstacol detectat
 
 // viteza motoarelor
-#define VITEZA_MOTOR_DREAPTA 79
-#define VITEZA_MOTOR_STANGA 86
+#define VITEZA_MOTOR_DREAPTA 879
+#define VITEZA_MOTOR_STANGA 96
 
 //definiti pinii utilizati pentru controlul motoarelor
 //pinii enA si enB sunt folositi pentru a controla viteza motoarelor in functie de semnalul PWM
