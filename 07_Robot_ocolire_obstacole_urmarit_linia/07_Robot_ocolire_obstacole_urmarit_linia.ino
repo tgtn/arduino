@@ -89,7 +89,7 @@ void loop() {
 	Serial.println(lineSensorValueL);
 	Serial.println(lineSensorValueC);
 	Serial.println(lineSensorValueR);
-	Serial.println("===");
+	Serial.println("=====");
 
 	// print: 2389ms = 41.19cm
 	//              in baza 10;------v  sau simplu: String(duration1)
