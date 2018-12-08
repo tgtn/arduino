@@ -69,8 +69,7 @@ void loop() {
 	// all the above prints: 2389ms = 41.19cm
 
 	//citirea de la Senzorul 2
-	distantaStanga = readSensorValueCm(trigPinSenzorStanga,
-	echoPinSenzorStanga);
+	distantaStanga = readSensorValueCm(trigPinSenzorStanga, echoPinSenzorStanga);
 
 	// print: 2389ms = 41.19cm
 	//              in baza 10;------v  sau simplu: String(duration1)
