@@ -89,7 +89,12 @@ void loop() {
 	Serial.println(lineSensorValueL);
 	Serial.println(lineSensorValueC);
 	Serial.println(lineSensorValueR);
-	Serial.println("=====");
+
+	int lineSensorVals[3] = {lineSensorValueL, lineSensorValueC, lineSensorValueR};
+	int lineSensorState = binaryArrayToInt(lineSensorVals, 3);
+
+	Serial.print("===== line sensor state = ");
+	Serial.println(lineSensorState);
 
 	// print: 2389ms = 41.19cm
 	//              in baza 10;------v  sau simplu: String(duration1)
@@ -172,4 +177,15 @@ void trigerMeasurementSignal(int triggerPin) {
 	delayMicroseconds(10);
 	digitalWrite(triggerPin, LOW);
 	delayMicroseconds(2);
+}
+
+int binaryArrayToInt(int s[], int size) {
+	int n = 0;
+
+	for (int i = 0; i < size; ++i) {
+		n <<= 1;
+		n += s[i];
+	}
+
+	return n;
 }
