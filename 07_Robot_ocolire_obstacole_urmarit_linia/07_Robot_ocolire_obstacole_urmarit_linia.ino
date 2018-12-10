@@ -122,6 +122,16 @@ void loop() {
 
 	} else {
 		digitalWrite(ledPin, LOW);
+		if (lineSensorState == 0) {
+			// stop
+			viraj("stop");
+		} else if (lineSensorState == 2 || lineSensorState == 3) {
+			// viraj stanga in cautarea liniei
+			viraj("stanga");
+		} else if (lineSensorState == 6) {
+			// viraj dreapta in cautarea liniei
+			viraj("dreapta");
+		}
 	}
 
 	delay(100);
@@ -154,6 +164,17 @@ void rotireRobot(int directieMotorDreapta, int directieMotorStanga) {
 
 	viteza(VITEZA_MOTOR_DREAPTA, VITEZA_MOTOR_STANGA);
 	delay(300);
+}
+
+void viraj (String directie) {
+	Serial.println(directie);
+	if (directie == "stop") {
+		viteza(0, 0);
+	} else if (directie == "stanga") {
+		viteza(VITEZA_MOTOR_DREAPTA, 0);
+	} else {
+		viteza(0, VITEZA_MOTOR_STANGA);
+	}
 }
 
 double microsecondsToCentimeters(long microseconds) {
