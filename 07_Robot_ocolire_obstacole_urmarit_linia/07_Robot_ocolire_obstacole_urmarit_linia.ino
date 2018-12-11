@@ -12,8 +12,10 @@ double distantaDreapta, distantaStanga;
 #define ledPin LED_BUILTIN // led de semnalizare obstacol detectat
 
 // viteza motoarelor
-#define VITEZA_MOTOR_DREAPTA 879
-#define VITEZA_MOTOR_STANGA 96
+/*#define VITEZA_MOTOR_DREAPTA 87
+#define VITEZA_MOTOR_STANGA 96*/
+#define VITEZA_MOTOR_DREAPTA 60
+#define VITEZA_MOTOR_STANGA 66
 
 //definiti pinii utilizati pentru controlul motoarelor
 //pinii enA si enB sunt folositi pentru a controla viteza motoarelor in functie de semnalul PWM
@@ -69,9 +71,6 @@ void setup() {
 }
 
 void loop() {
-	directie(inainte, inainte);
-	viteza(VITEZA_MOTOR_DREAPTA, VITEZA_MOTOR_STANGA);
-
 	// citirea de la senzor 1
 	distantaDreapta = readSensorValueCm(trigPinSenzorDreapta, echoPinSenzorDreapta);
 
@@ -103,7 +102,7 @@ void loop() {
 
 	if ((distantaDreapta > 0 && distantaDreapta < minDistance)
 			|| (distantaStanga > 0 && distantaStanga < minDistance)) {
-		String obstacolPePartea = "dreapta";
+		/*String obstacolPePartea = "dreapta";
 		if (distantaStanga < distantaDreapta) {
 			obstacolPePartea = "stanga";
 		}
@@ -117,24 +116,25 @@ void loop() {
 			rotireRobot(inainte, inapoi);
 		} else {
 			rotireRobot(inapoi, inainte);
-
-		}
-
+		}*/
 	} else {
 		digitalWrite(ledPin, LOW);
 		if (lineSensorState == 0) {
 			// stop
-			viraj("stop");
-		} else if (lineSensorState == 2 || lineSensorState == 3) {
+			viteza(0, 0);
+		} else if (lineSensorState == 2 || lineSensorState == 3 || lineSensorState == 4) {
 			// viraj stanga in cautarea liniei
-			viraj("stanga");
-		} else if (lineSensorState == 6) {
+			viteza(VITEZA_MOTOR_DREAPTA, 0);
+		} else if (lineSensorState == 1 || lineSensorState == 6) {
 			// viraj dreapta in cautarea liniei
-			viraj("dreapta");
+			viteza(0, VITEZA_MOTOR_STANGA);
+		} else {
+			directie(inainte, inainte);
+			viteza(VITEZA_MOTOR_DREAPTA, VITEZA_MOTOR_STANGA);
 		}
 	}
 
-	delay(100);
+	//delay(100);
 }
 
 void directie(int directiaMotorDreapta, int directiaMotorStanga) {
@@ -164,17 +164,6 @@ void rotireRobot(int directieMotorDreapta, int directieMotorStanga) {
 
 	viteza(VITEZA_MOTOR_DREAPTA, VITEZA_MOTOR_STANGA);
 	delay(300);
-}
-
-void viraj (String directie) {
-	Serial.println(directie);
-	if (directie == "stop") {
-		viteza(0, 0);
-	} else if (directie == "stanga") {
-		viteza(VITEZA_MOTOR_DREAPTA, 0);
-	} else {
-		viteza(0, VITEZA_MOTOR_STANGA);
-	}
 }
 
 double microsecondsToCentimeters(long microseconds) {
