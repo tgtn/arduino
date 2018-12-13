@@ -73,12 +73,12 @@ void setup() {
 
 void loop() {
 	// citirea de la senzor dreapta
-	distantaDreapta = distSensorRight.ping_cm();
-	// Serial.println("Senzor dreapta: " + String(distantaDreapta) + "cm");
-
 	//citirea de la Senzorul stanga
 	distantaStanga = distSensorLeft.ping_cm();
 	// Serial.println("Senzor stanga: " + String(distantaStanga) + "cm");
+
+	distantaDreapta = distSensorRight.ping_cm();
+	// Serial.println("Senzor dreapta: " + String(distantaDreapta) + "cm");
 
 	lineSensorValueL = digitalRead(pinLineSensorL);
 	lineSensorValueC = digitalRead(pinLineSensorC);
@@ -96,11 +96,11 @@ void loop() {
 	if ((distantaDreapta > 0 && distantaDreapta < minDistance)
 			|| (distantaStanga > 0 && distantaStanga < minDistance)) {
 		String obstacolPePartea = "dreapta";
-		if (distantaStanga < distantaDreapta) {
+		if (distantaDreapta == 0 || distantaStanga < distantaDreapta) {
 			obstacolPePartea = "stanga";
 		}
-		//Serial.println("Detectat obstacol la senzorul " + obstacolPePartea + " la "
-		//				 + String(min(distantaDreapta, distantaStanga)) + "cm");
+		Serial.println("Detectat obstacol la senzorul " + obstacolPePartea);
+
 		// aprindem led-ul builtin
 		digitalWrite(ledPin, HIGH);
 
