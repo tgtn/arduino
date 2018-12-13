@@ -93,11 +93,6 @@ void loop() {
 	// Serial.print("===== line sensor state = ");
 	// Serial.println(lineSensorState);
 
-	// print: 2389ms = 41.19cm
-	//              in baza 10;------v  sau simplu: String(duration1)
-	// Serial.println("Senzor stanga: " + String(duration2, 10) + "us = " + String(cm2) + "cm");
-	// all the above prints: 2389ms = 41.19cm
-
 	if ((distantaDreapta > 0 && distantaDreapta < minDistance)
 			|| (distantaStanga > 0 && distantaStanga < minDistance)) {
 		String obstacolPePartea = "dreapta";
@@ -115,7 +110,6 @@ void loop() {
 			rotireRobot(inapoi, inainte);
 		}
 	} else {
-		digitalWrite(ledPin, LOW);
 		if (lineSensorState == 0) {
 			// stop
 			viteza(0, 0);
@@ -162,6 +156,8 @@ void rotireRobot(int directieMotorDreapta, int directieMotorStanga) {
 
 	viteza(VITEZA_MOTOR_DREAPTA, VITEZA_MOTOR_STANGA);
 	delay(300);
+
+	digitalWrite(ledPin, LOW);
 }
 
 int binaryArrayToInt(int s[], int size) {
