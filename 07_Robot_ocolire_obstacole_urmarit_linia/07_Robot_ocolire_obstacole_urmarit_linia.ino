@@ -1,4 +1,6 @@
 #include "Arduino.h"
+#include <NewPing.h>
+
 // senzor 1 (dreapta)
 int trigPinSenzorDreapta = 9; // pinul pe care dam senzorului comanda de masurare
 int echoPinSenzorDreapta = 10; // pinul pe care primim raspunsul
@@ -8,12 +10,12 @@ int echoPinSenzorDreapta = 10; // pinul pe care primim raspunsul
 #define echoPinSenzorStanga 2 // pinul pe care primim raspunsul
 
 double distantaDreapta, distantaStanga;
-#define minDistance 30
+#define minDistance 20
 #define ledPin LED_BUILTIN // led de semnalizare obstacol detectat
 
 // viteza motoarelor
 /*#define VITEZA_MOTOR_DREAPTA 87
-#define VITEZA_MOTOR_STANGA 96*/
+ #define VITEZA_MOTOR_STANGA 96*/
 #define VITEZA_MOTOR_DREAPTA 60
 #define VITEZA_MOTOR_STANGA 66
 
@@ -42,12 +44,11 @@ int lineSensorValueR = 0;
 int lineSensorValueC = 0;
 int lineSensorValueL = 0;
 
+NewPing distSensorRight(trigPinSenzorDreapta, echoPinSenzorDreapta, minDistance);
+NewPing distSensorLeft(trigPinSenzorStanga, echoPinSenzorStanga, minDistance);
+
 void setup() {
 	Serial.begin(9600);
-	pinMode(trigPinSenzorDreapta, OUTPUT);
-	pinMode(echoPinSenzorDreapta, INPUT);
-	pinMode(trigPinSenzorStanga, OUTPUT);
-	pinMode(echoPinSenzorStanga, INPUT);
 	pinMode(ledPin, OUTPUT);
 
 	//toti pinii utilizati de driverul L298N sunt OUTPUT
@@ -71,29 +72,26 @@ void setup() {
 }
 
 void loop() {
-	// citirea de la senzor 1
-	distantaDreapta = readSensorValueCm(trigPinSenzorDreapta, echoPinSenzorDreapta);
+	// citirea de la senzor dreapta
+	distantaDreapta = distSensorRight.ping_cm();
+	// Serial.println("Senzor dreapta: " + String(distantaDreapta) + "cm");
 
-	// print: 2389ms = 41.19cm
-	//              in baza 10;------v  sau simplu: String(duration1)
-	// Serial.println("Senzor dreapta: " + String(duration1, 10) + "us = " + String(cm1) + "cm");
-	// all the above prints: 2389ms = 41.19cm
-
-	//citirea de la Senzorul 2
-	distantaStanga = readSensorValueCm(trigPinSenzorStanga, echoPinSenzorStanga);
+	//citirea de la Senzorul stanga
+	distantaStanga = distSensorLeft.ping_cm();
+	// Serial.println("Senzor stanga: " + String(distantaStanga) + "cm");
 
 	lineSensorValueL = digitalRead(pinLineSensorL);
 	lineSensorValueC = digitalRead(pinLineSensorC);
 	lineSensorValueR = digitalRead(pinLineSensorR);
-	Serial.println(lineSensorValueL);
-	Serial.println(lineSensorValueC);
-	Serial.println(lineSensorValueR);
+	// Serial.println(lineSensorValueL);
+	// Serial.println(lineSensorValueC);
+	// Serial.println(lineSensorValueR);
 
-	int lineSensorVals[3] = {lineSensorValueL, lineSensorValueC, lineSensorValueR};
+	int lineSensorVals[3] = { lineSensorValueL, lineSensorValueC, lineSensorValueR };
 	int lineSensorState = binaryArrayToInt(lineSensorVals, 3);
 
-	Serial.print("===== line sensor state = ");
-	Serial.println(lineSensorState);
+	// Serial.print("===== line sensor state = ");
+	// Serial.println(lineSensorState);
 
 	// print: 2389ms = 41.19cm
 	//              in baza 10;------v  sau simplu: String(duration1)
@@ -102,13 +100,12 @@ void loop() {
 
 	if ((distantaDreapta > 0 && distantaDreapta < minDistance)
 			|| (distantaStanga > 0 && distantaStanga < minDistance)) {
-		/*String obstacolPePartea = "dreapta";
+		String obstacolPePartea = "dreapta";
 		if (distantaStanga < distantaDreapta) {
 			obstacolPePartea = "stanga";
 		}
-		Serial.println(
-				"Detectat obstacol la senzorul " + obstacolPePartea + " la "
-						+ String(min(distantaDreapta, distantaStanga)) + "cm");
+		//Serial.println("Detectat obstacol la senzorul " + obstacolPePartea + " la "
+		//				 + String(min(distantaDreapta, distantaStanga)) + "cm");
 		// aprindem led-ul builtin
 		digitalWrite(ledPin, HIGH);
 
@@ -116,13 +113,14 @@ void loop() {
 			rotireRobot(inainte, inapoi);
 		} else {
 			rotireRobot(inapoi, inainte);
-		}*/
+		}
 	} else {
 		digitalWrite(ledPin, LOW);
 		if (lineSensorState == 0) {
 			// stop
 			viteza(0, 0);
-		} else if (lineSensorState == 2 || lineSensorState == 3 || lineSensorState == 4) {
+		} else if (lineSensorState == 2 || lineSensorState == 3
+				|| lineSensorState == 4) {
 			// viraj stanga in cautarea liniei
 			viteza(VITEZA_MOTOR_DREAPTA, 0);
 		} else if (lineSensorState == 1 || lineSensorState == 6) {
@@ -134,7 +132,7 @@ void loop() {
 		}
 	}
 
-	//delay(100);
+	//	delay(100);
 }
 
 void directie(int directiaMotorDreapta, int directiaMotorStanga) {
@@ -164,29 +162,6 @@ void rotireRobot(int directieMotorDreapta, int directieMotorStanga) {
 
 	viteza(VITEZA_MOTOR_DREAPTA, VITEZA_MOTOR_STANGA);
 	delay(300);
-}
-
-double microsecondsToCentimeters(long microseconds) {
-	return (double) microseconds / (double) 58;
-}
-
-double readSensorValueCm(int triggerPin, int echoPin) {
-	trigerMeasurementSignal(triggerPin);
-
-	// get the value returned by the sensor on port echoPin
-	long duration1 = pulseIn(echoPin, HIGH);
-
-	// convert value read from sensor in microseconds to centimeters
-	return microsecondsToCentimeters(duration1);
-}
-
-void trigerMeasurementSignal(int triggerPin) {
-	digitalWrite(triggerPin, LOW);
-	delayMicroseconds(2);
-	digitalWrite(triggerPin, HIGH);
-	delayMicroseconds(10);
-	digitalWrite(triggerPin, LOW);
-	delayMicroseconds(2);
 }
 
 int binaryArrayToInt(int s[], int size) {

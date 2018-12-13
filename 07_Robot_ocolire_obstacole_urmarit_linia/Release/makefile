@@ -9,6 +9,7 @@ RM := rm
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir.mk
+-include libraries/NewPing/src/subdir.mk
 -include core/core/subdir.mk
 -include objects.mk
 

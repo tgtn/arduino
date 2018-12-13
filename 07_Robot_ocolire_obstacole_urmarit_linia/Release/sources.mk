@@ -36,4 +36,5 @@ CPP_DEPS :=
 SUBDIRS := \
 . \
 core/core \
+libraries/NewPing/src \
 

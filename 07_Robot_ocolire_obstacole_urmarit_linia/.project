@@ -41,5 +41,10 @@
 			<type>2</type>
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/arduino/hardware/avr/1.6.23/variants/standard</locationURI>
 		</link>
+		<link>
+			<name>libraries/NewPing</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/NewPing/1.9.1</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>
