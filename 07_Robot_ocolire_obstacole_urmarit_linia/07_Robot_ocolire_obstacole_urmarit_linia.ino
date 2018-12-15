@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include <NewPing.h>
 
+boolean proximityDetection = false;
 // senzor 1 (dreapta)
 int trigPinSenzorDreapta = 9; // pinul pe care dam senzorului comanda de masurare
 int echoPinSenzorDreapta = 10; // pinul pe care primim raspunsul
@@ -10,14 +11,14 @@ int echoPinSenzorDreapta = 10; // pinul pe care primim raspunsul
 #define echoPinSenzorStanga 2 // pinul pe care primim raspunsul
 
 double distantaDreapta, distantaStanga;
-#define minDistance 20
+#define minDistance 10
 #define ledPin LED_BUILTIN // led de semnalizare obstacol detectat
 
 // viteza motoarelor
 /*#define VITEZA_MOTOR_DREAPTA 87
  #define VITEZA_MOTOR_STANGA 96*/
-#define VITEZA_MOTOR_DREAPTA 60
-#define VITEZA_MOTOR_STANGA 66
+#define VITEZA_MOTOR_DREAPTA 56
+#define VITEZA_MOTOR_STANGA 56
 
 //definiti pinii utilizati pentru controlul motoarelor
 //pinii enA si enB sunt folositi pentru a controla viteza motoarelor in functie de semnalul PWM
@@ -44,6 +45,8 @@ int lineSensorValueR = 0;
 int lineSensorValueC = 0;
 int lineSensorValueL = 0;
 
+int lastLineSensorState = 0;
+
 NewPing distSensorRight(trigPinSenzorDreapta, echoPinSenzorDreapta, minDistance);
 NewPing distSensorLeft(trigPinSenzorStanga, echoPinSenzorStanga, minDistance);
 
@@ -68,17 +71,27 @@ void setup() {
 	directie(inainte, inainte);
 	viteza(0, 0);
 
-	delay(5000);
+	delay(1000);
+	Serial.println(1);
+	delay(1000);
+	Serial.println(2);
+	delay(1000);
+	Serial.println(3);
+	delay(1000);
+	Serial.println(4);
+	delay(1000);
+	Serial.println(5);
 }
 
 void loop() {
-	// citirea de la senzor dreapta
-	//citirea de la Senzorul stanga
-	distantaStanga = distSensorLeft.ping_cm();
-	// Serial.println("Senzor stanga: " + String(distantaStanga) + "cm");
+	if (proximityDetection) {
+		// citirea de la senzor dreapta
+		distantaStanga = distSensorLeft.ping_cm();
+		// Serial.println("Senzor stanga: " + String(distantaStanga) + "cm");
 
-	distantaDreapta = distSensorRight.ping_cm();
-	// Serial.println("Senzor dreapta: " + String(distantaDreapta) + "cm");
+		//citirea de la Senzorul stanga
+		distantaDreapta = distSensorRight.ping_cm();
+	}
 
 	lineSensorValueL = digitalRead(pinLineSensorL);
 	lineSensorValueC = digitalRead(pinLineSensorC);
@@ -87,19 +100,20 @@ void loop() {
 	// Serial.println(lineSensorValueC);
 	// Serial.println(lineSensorValueR);
 
-	int lineSensorVals[3] = { lineSensorValueL, lineSensorValueC, lineSensorValueR };
+	int lineSensorVals[3] = { lineSensorValueL, lineSensorValueC,
+			lineSensorValueR };
 	int lineSensorState = binaryArrayToInt(lineSensorVals, 3);
-
 	// Serial.print("===== line sensor state = ");
 	// Serial.println(lineSensorState);
 
 	if ((distantaDreapta > 0 && distantaDreapta < minDistance)
 			|| (distantaStanga > 0 && distantaStanga < minDistance)) {
 		String obstacolPePartea = "dreapta";
-		if (distantaDreapta == 0 || distantaStanga < distantaDreapta) {
+		if (distantaDreapta == 0
+				|| (distantaStanga > 0 && distantaStanga < distantaDreapta)) {
 			obstacolPePartea = "stanga";
 		}
-		Serial.println("Detectat obstacol la senzorul " + obstacolPePartea);
+		Serial.println("Detectat obstacol la senzorul " + obstacolPePartea + "(" + String(distantaStanga) + ", " + String(distantaDreapta) + ")");
 
 		// aprindem led-ul builtin
 		digitalWrite(ledPin, HIGH);
@@ -109,6 +123,7 @@ void loop() {
 		} else {
 			rotireRobot(inapoi, inainte);
 		}
+		lastLineSensorState = 0;
 	} else {
 		if (lineSensorState == 0) {
 			// stop
@@ -116,13 +131,32 @@ void loop() {
 		} else if (lineSensorState == 2 || lineSensorState == 3
 				|| lineSensorState == 4) {
 			// viraj stanga in cautarea liniei
-			viteza(VITEZA_MOTOR_DREAPTA, 0);
+			viteza(VITEZA_MOTOR_DREAPTA + 30, 0);
+			// Serial.println("Cauta stanga");
 		} else if (lineSensorState == 1 || lineSensorState == 6) {
 			// viraj dreapta in cautarea liniei
-			viteza(0, VITEZA_MOTOR_STANGA);
+			viteza(0, VITEZA_MOTOR_STANGA + 30);
+			// Serial.println("Cauta dreapta");
+		} else if (lineSensorState == 7 && lastLineSensorState != 0) {
+			if (lastLineSensorState == 6) {
+				// curba usoara dreapta
+				viteza(VITEZA_MOTOR_DREAPTA - 10, VITEZA_MOTOR_STANGA + 20);
+			} else if (lastLineSensorState == 3) {
+				// curba usoara stanga
+				viteza(VITEZA_MOTOR_DREAPTA + 20, VITEZA_MOTOR_STANGA - 10);
+			}
 		} else {
 			directie(inainte, inainte);
 			viteza(VITEZA_MOTOR_DREAPTA, VITEZA_MOTOR_STANGA);
+		}
+
+		// daca OK salvam ultima pozition
+		if (lineSensorState != 7) {
+			if (lineSensorState == 5) {
+				lastLineSensorState = 0;
+			} else  {
+				lastLineSensorState = lineSensorState;
+			}
 		}
 	}
 
