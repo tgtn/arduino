@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include <NewPing.h>
 
-boolean proximityDetection = false;
+boolean proximityDetection = true;
 // senzor 1 (dreapta)
 int trigPinSenzorDreapta = 9; // pinul pe care dam senzorului comanda de masurare
 int echoPinSenzorDreapta = 10; // pinul pe care primim raspunsul
@@ -11,7 +11,7 @@ int echoPinSenzorDreapta = 10; // pinul pe care primim raspunsul
 #define echoPinSenzorStanga 2 // pinul pe care primim raspunsul
 
 double distantaDreapta, distantaStanga;
-#define minDistance 10
+#define minDistance 15
 #define ledPin LED_BUILTIN // led de semnalizare obstacol detectat
 
 // viteza motoarelor
@@ -91,6 +91,7 @@ void loop() {
 
 		//citirea de la Senzorul stanga
 		distantaDreapta = distSensorRight.ping_cm();
+		// Serial.println("Senzor dreapta: " + String(distantaDreapta) + "cm");
 	}
 
 	lineSensorValueL = digitalRead(pinLineSensorL);
